@@ -34,6 +34,9 @@ public class TestYelp {
 	public void onWebsite(){
 		selenium = new DefaultSelenium("localhost", 4444, "*chrome", "http://www.yelp.com/");
 		selenium.start();
+		//About the following line, it confuses me too. When I input www.yelp.com, the website just automatically go to www.yelp.com/pittsburgh. 
+		//And www.yelp.com/pittsburgh page is different with http://www.yelp.com/search?find_desc=&find_loc=pittsburgh&ns=1#, the later one shows the business of Pittsburgh
+		//If you don't put the following line, there would be a bug, which makes visitor cannot go to yelp.com
 		selenium.open("/pittsburgh");
 	}
 	
@@ -51,15 +54,15 @@ public class TestYelp {
 		selenium.open("/search?find_desc=&find_loc=pittsburgh&ns=1#cflt="+str);
 	}
 	
-	@Given("member is on the www.yelp.com")
-	public void MemberonWebsite(){
+	@Given("member is on www.yelp.com")
+	public void memberOnWebsite(){
 		selenium = new DefaultSelenium("localhost", 4444, "*chrome", "http://www.yelp.com/");
 		selenium.start();
 		selenium.open("/pittsburgh");
 	}
 	
 	@Given("member is on (.+) page")
-	public void MemberonPage(String str){
+	public void memberOnPage(String str){
 		selenium = new DefaultSelenium("localhost", 4444, "*chrome", "http://www.yelp.com/");
 		selenium.start();
 		if(str.equals("Log In")){
@@ -69,7 +72,7 @@ public class TestYelp {
 	}
 	
 	@Given("member has logged in")
-	public void MemberLoggedIn() throws InterruptedException{
+	public void memberLoggedIn() throws InterruptedException{
 		selenium = new DefaultSelenium("localhost", 4444, "*chrome", "http://www.yelp.com/");
 		selenium.start();
 		selenium.open("/pittsburgh");
@@ -86,7 +89,7 @@ public class TestYelp {
 		Thread.sleep(3000);
 	}
 	
-	@Given("the review page has showed the list of (.+)")
+	@Given("the review page has showed the reviews of (.+)")
 	public void reviewList(String str) throws InterruptedException{
 		selenium = new DefaultSelenium("localhost", 4444, "*chrome", "http://www.yelp.com/");
 		selenium.start();
@@ -97,7 +100,7 @@ public class TestYelp {
 		Thread.sleep(3000);
 	}
 	
-	@When("visitor search ([A-z]*)")
+	@When("visitor searches for ([A-z]*)")
 	public void searchPlace(String place){
 		selenium.type("id=dropperText_Mast", place);
 		selenium.click("id=header-search-submit");
@@ -120,7 +123,7 @@ public class TestYelp {
 		if(area.equals("Downtown")) selenium.click("name=place");
 		else if(area.equals("Oakland")) selenium.click("xpath=(//input[@name='place'])[2]");
 		else if(area.equals("North Side")) selenium.click("xpath=(//input[@name='place'])[3]");
-		else selenium.click("xpath=(//input[@name='place'])[4]");
+		else fail();
 		Thread.sleep(3000);
 	}
 	
@@ -174,7 +177,7 @@ public class TestYelp {
 		Thread.sleep(3000);
 	}
 	
-	@Then("the website should show the business in ([A-z]*)")
+	@Then("the website should show the businesses in ([A-z]*)")
 	public void showBsiness(String place){		
 		Pattern p = null;
 		assertTrue(p.matches(".*"+place+".*", selenium.getText("css=h1")));
@@ -195,13 +198,13 @@ public class TestYelp {
 		assertTrue(p.matches(".*"+area+".*", selenium.getText("css=span.neighborhood-str-list")));
 	}
 	
-	@Then("the website should on the page of ([A-z]*)")
+	@Then("the website should be on the page of ([A-z]*)")
 	public void showPage(String str){
 		Pattern p= null;
 		assertTrue(p.matches(str+".*", selenium.getText("css=h1")));
 	}
 	
-	@Then("member should on the page of (.+)")
+	@Then("member should be on the page of (.+)")
 	public void MemberIsOnPage(String str){
 		if (str.equals("Sign Up")) {
 			assertEquals("https://www.yelp.com/signup", selenium.getLocation());
@@ -220,8 +223,8 @@ public class TestYelp {
 		assertEquals("Weichuan H.'s Reviews | Pittsburgh | Yelp", selenium.getTitle());
 	}
 	
-	@Then("the page should show the list of (.+)")
-	public void pageOnList(String str){
+	@Then("the page should show the reviews of (.+)")
+	public void pageOnReview(String str){
 		Pattern p = null;
 		assertTrue(p.matches(".*"+str+".*", selenium.getText("id=bizTitleLink0")));
 	}
